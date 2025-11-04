@@ -16,18 +16,18 @@ import pickle
 from pathlib import Path
 
 # API Key Configuration
-API_KEY = "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"
+# Will be loaded from Streamlit secrets (cloud) or environment variable (local)
+API_KEY = None
 PERSIST_DIRECTORY = "./faiss_db"
 RESUME_PATH = "./resume.pdf"
 FAISS_INDEX_PATH = "./faiss_db/index.faiss"
 FAISS_PKL_PATH = "./faiss_db/index.pkl"
 
-# Set OpenAI API key
-os.environ["OPENAI_API_KEY"] = API_KEY
-
 class ChatBot:
     def __init__(self):
         # Set API key in environment first (required)
+        if API_KEY is None:
+            raise ValueError("API_KEY not set. Please set it in main() first.")
         os.environ["OPENAI_API_KEY"] = API_KEY
         
         # Initialize embeddings - uses OPENAI_API_KEY from environment
@@ -259,6 +259,24 @@ def main():
         page_icon="⚙️",
         layout="centered"
     )
+    
+    # Get API key from Streamlit secrets (cloud) or environment variable (local)
+    global API_KEY
+    
+    # Try Streamlit secrets first (for cloud deployment)
+    try:
+        if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+            API_KEY = st.secrets["OPENAI_API_KEY"]
+            os.environ["OPENAI_API_KEY"] = API_KEY
+        elif os.getenv("OPENAI_API_KEY"):
+            # Fallback to environment variable (for local development)
+            API_KEY = os.getenv("OPENAI_API_KEY")
+        else:
+            st.error("❌ **API Key Missing!** Please set `OPENAI_API_KEY` in Streamlit Secrets (cloud) or environment variable (local).")
+            st.stop()
+    except Exception as e:
+        st.error(f"❌ **Error loading API key:** {str(e)}")
+        st.stop()
     
     # Light pink theme
     st.markdown("""

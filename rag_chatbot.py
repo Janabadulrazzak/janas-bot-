@@ -786,9 +786,9 @@ def main():
             "What is Jana's professional background?"
         ]
         
-            # Display suggested questions in a 2-column grid
-            # Use a container to ensure they're visible
-            with st.container():
+        # Display suggested questions in a 2-column grid
+        # Use a container to ensure they're visible
+        with st.container():
                 # Create 2 columns for better visibility
                 col1, col2 = st.columns(2)
                 for i, question in enumerate(suggested_questions):

@@ -456,6 +456,45 @@ def main():
         with st.chat_message(message["role"]):
             st.write(message["content"])
     
+    # Suggested questions
+    st.markdown("### 💡 Suggested Questions:")
+    suggested_questions = [
+        "What companies has Jana worked at?",
+        "What is Jana's educational background?",
+        "What are Jana's skills and qualifications?",
+        "Tell me about Jana's work experience",
+        "What are Jana's main achievements?",
+        "What is Jana's professional background?"
+    ]
+    
+    # Display suggested questions as clickable buttons
+    cols = st.columns(2)
+    for i, question in enumerate(suggested_questions):
+        with cols[i % 2]:
+            if st.button(question, key=f"suggest_{i}", use_container_width=True):
+                # Add the suggested question to chat
+                st.session_state.messages.append({"role": "user", "content": question})
+                with st.chat_message("user"):
+                    st.write(question)
+                with st.chat_message("assistant"):
+                    if st.session_state.user_bot is None:
+                        response = "Bot not initialized. Please contact support."
+                    elif st.session_state.user_bot.qa_chain is None:
+                        response = "QA system not ready. Please contact support."
+                    else:
+                        with st.spinner("Thinking..."):
+                            try:
+                                response = st.session_state.user_bot.get_response(question)
+                                if response is None or response == "":
+                                    response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
+                            except Exception as e:
+                                response = f"Error: {str(e)}. Please try again."
+                    st.write(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                st.rerun()
+    
+    st.markdown("---")
+    
     # Chat input
     if prompt := st.chat_input("Ask me about Jana..."):
         # Add user message

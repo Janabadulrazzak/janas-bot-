@@ -24,11 +24,11 @@ The error shows `...3-UA` which means the **OLD disabled key** is still in Secre
 1. In the Secrets text box, type or paste this **EXACTLY**:
 
 ```toml
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "YOUR_API_KEY_HERE"
 ```
 
 2. **VERIFY:**
-   - ✅ Starts with: `sk-proj-WLecXAAn5`
+   - ✅ Starts with: `YOUR_API_KEY_HERE
    - ✅ Ends with: `...9zGoA` (NOT `...3-UA`)
    - ✅ Has quotes: `"key"`
    - ✅ Format: `OPENAI_API_KEY = "..."`
@@ -104,6 +104,6 @@ OPENAI_API_KEY = "sk-proj-...3-UA"
 
 **CORRECT (NEW - USE THIS):**
 ```
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "YOUR_API_KEY_HERE"
 ```
 

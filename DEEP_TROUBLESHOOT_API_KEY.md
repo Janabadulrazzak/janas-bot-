@@ -87,7 +87,7 @@ If you have TWO apps (user and admin):
 ### Issue: "The key looks wrong"
 **Fix:**
 - Copy the ENTIRE key (very long)
-- Make sure it starts with: `sk-proj-WLecXAAn5`
+- Make sure it starts with: `YOUR_API_KEY_HERE
 - Make sure it ends with: `...9zGoA`
 - Make sure there are quotes: `"key"`
 - No extra spaces before or after
@@ -97,7 +97,7 @@ If you have TWO apps (user and admin):
 Copy this EXACTLY (all one line):
 
 ```toml
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "YOUR_API_KEY_HERE"
 ```
 
 ## If Still Not Working

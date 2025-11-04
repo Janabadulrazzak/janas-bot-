@@ -236,6 +236,12 @@ If the question is a greeting (like "hi", "hello", "hey"), respond warmly and in
 - "Hi! I'm Jana's Bot. I'm here to help answer questions about Jana's background, experience, skills, and qualifications. What would you like to know?"
 - "Hello! Nice to meet you! I can tell you about Jana's professional experience, education, and skills. Feel free to ask me anything!"
 
+For questions about work experience, companies, or employment history:
+- ALWAYS include ALL companies Jana has worked at
+- List every company mentioned in the resume
+- Provide details about each role/company
+- Don't skip or omit any companies - be comprehensive
+
 For other questions, use the following pieces of context from Jana's resume to answer. Provide a clear, natural, and conversational answer in your own words. Don't just copy text verbatim - synthesize the information and explain it naturally.
 
 If you don't know the answer based on the context, say so politely.
@@ -244,7 +250,7 @@ Context: {context}
 
 Question: {question}
 
-Answer in a friendly, natural, conversational way:"""
+Answer in a friendly, natural, conversational way, making sure to include ALL relevant information, especially all companies when discussing work experience:"""
         
         PROMPT = PromptTemplate(
             template=prompt_template,
@@ -296,18 +302,26 @@ def main():
     
     # Try Streamlit secrets first (for cloud deployment)
     try:
-        if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+        # Check if secrets are available and contain the key
+        if hasattr(st, 'secrets') and st.secrets and 'OPENAI_API_KEY' in st.secrets:
             API_KEY = st.secrets["OPENAI_API_KEY"]
             os.environ["OPENAI_API_KEY"] = API_KEY
         elif os.getenv("OPENAI_API_KEY"):
             # Fallback to environment variable (for local development)
             API_KEY = os.getenv("OPENAI_API_KEY")
+            os.environ["OPENAI_API_KEY"] = API_KEY
         else:
             st.error("❌ **API Key Missing!** Please set `OPENAI_API_KEY` in Streamlit Secrets (cloud) or environment variable (local).")
             st.stop()
     except Exception as e:
-        st.error(f"❌ **Error loading API key:** {str(e)}")
-        st.stop()
+        # If secrets access fails, try environment variable
+        if os.getenv("OPENAI_API_KEY"):
+            API_KEY = os.getenv("OPENAI_API_KEY")
+            os.environ["OPENAI_API_KEY"] = API_KEY
+        else:
+            st.error(f"❌ **Error loading API key:** {str(e)}")
+            st.error("💡 **For local development:** Set `OPENAI_API_KEY` environment variable")
+            st.stop()
     
     # Light pink theme
     st.markdown("""

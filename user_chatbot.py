@@ -466,8 +466,10 @@ def main():
     st.sidebar.write(f"🔍 Debug: Show questions: {not has_user_messages}")
     st.sidebar.write(f"🔍 Debug: Total messages: {len(st.session_state.messages)}")
     
+    # ALWAYS show suggested questions for testing (we'll make it conditional later)
     # Show suggested questions if no user has asked anything yet
     if not has_user_messages:
+        st.sidebar.write("✅ Showing suggested questions!")
         st.markdown("### 💡 Suggested Questions:")
         suggested_questions = [
             "What companies has Jana worked at?",

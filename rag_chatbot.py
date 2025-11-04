@@ -795,29 +795,29 @@ def main():
                 # Alternate between columns
                 with col1 if i % 2 == 0 else col2:
                     if st.button(question, key=f"suggest_{i}", use_container_width=True):
-                            # Add the suggested question to chat
-                            st.session_state.messages.append({"role": "user", "content": question})
-                            with st.chat_message("user"):
-                                st.write(question)
-                            with st.chat_message("assistant"):
-                                if not st.session_state.resume_loaded:
-                                    response = "Please upload a resume PDF first using the upload section above, then click 'Load Resume'."
+                        # Add the suggested question to chat
+                        st.session_state.messages.append({"role": "user", "content": question})
+                        with st.chat_message("user"):
+                            st.write(question)
+                        with st.chat_message("assistant"):
+                            if not st.session_state.resume_loaded:
+                                response = "Please upload a resume PDF first using the upload section above, then click 'Load Resume'."
+                            else:
+                                if st.session_state.bot is None:
+                                    response = "Bot not initialized. Please reload the page."
+                                elif st.session_state.bot.qa_chain is None:
+                                    response = "QA chain not set up. Please reload your resume."
                                 else:
-                                    if st.session_state.bot is None:
-                                        response = "Bot not initialized. Please reload the page."
-                                    elif st.session_state.bot.qa_chain is None:
-                                        response = "QA chain not set up. Please reload your resume."
-                                    else:
-                                        with st.spinner("Thinking..."):
-                                            try:
-                                                response = st.session_state.bot.get_response(question)
-                                                if response is None or response == "":
-                                                    response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
-                                            except Exception as e:
-                                                response = f"Error: {str(e)}. Please try again or reload the resume."
-                                st.write(response)
-                                st.session_state.messages.append({"role": "assistant", "content": response})
-                            st.rerun()
+                                    with st.spinner("Thinking..."):
+                                        try:
+                                            response = st.session_state.bot.get_response(question)
+                                            if response is None or response == "":
+                                                response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
+                                        except Exception as e:
+                                            response = f"Error: {str(e)}. Please try again or reload the resume."
+                            st.write(response)
+                            st.session_state.messages.append({"role": "assistant", "content": response})
+                        st.rerun()
         
         st.markdown("---")
     

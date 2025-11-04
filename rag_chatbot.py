@@ -786,36 +786,38 @@ def main():
             "What is Jana's professional background?"
         ]
         
-        # Display suggested questions horizontally as clickable buttons
-        # Use a container to ensure they're visible
-        with st.container():
-            cols = st.columns(len(suggested_questions))
-            for i, question in enumerate(suggested_questions):
-                with cols[i]:
-                    if st.button(question, key=f"suggest_{i}", use_container_width=True):
-                        # Add the suggested question to chat
-                        st.session_state.messages.append({"role": "user", "content": question})
-                        with st.chat_message("user"):
-                            st.write(question)
-                        with st.chat_message("assistant"):
-                            if not st.session_state.resume_loaded:
-                                response = "Please upload a resume PDF first using the upload section above, then click 'Load Resume'."
-                            else:
-                                if st.session_state.bot is None:
-                                    response = "Bot not initialized. Please reload the page."
-                                elif st.session_state.bot.qa_chain is None:
-                                    response = "QA chain not set up. Please reload your resume."
+            # Display suggested questions in a 2-column grid
+            # Use a container to ensure they're visible
+            with st.container():
+                # Create 2 columns for better visibility
+                col1, col2 = st.columns(2)
+                for i, question in enumerate(suggested_questions):
+                    # Alternate between columns
+                    with col1 if i % 2 == 0 else col2:
+                        if st.button(question, key=f"suggest_{i}", use_container_width=True):
+                            # Add the suggested question to chat
+                            st.session_state.messages.append({"role": "user", "content": question})
+                            with st.chat_message("user"):
+                                st.write(question)
+                            with st.chat_message("assistant"):
+                                if not st.session_state.resume_loaded:
+                                    response = "Please upload a resume PDF first using the upload section above, then click 'Load Resume'."
                                 else:
-                                    with st.spinner("Thinking..."):
-                                        try:
-                                            response = st.session_state.bot.get_response(question)
-                                            if response is None or response == "":
-                                                response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
-                                        except Exception as e:
-                                            response = f"Error: {str(e)}. Please try again or reload the resume."
-                            st.write(response)
-                            st.session_state.messages.append({"role": "assistant", "content": response})
-                        st.rerun()
+                                    if st.session_state.bot is None:
+                                        response = "Bot not initialized. Please reload the page."
+                                    elif st.session_state.bot.qa_chain is None:
+                                        response = "QA chain not set up. Please reload your resume."
+                                    else:
+                                        with st.spinner("Thinking..."):
+                                            try:
+                                                response = st.session_state.bot.get_response(question)
+                                                if response is None or response == "":
+                                                    response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
+                                            except Exception as e:
+                                                response = f"Error: {str(e)}. Please try again or reload the resume."
+                                st.write(response)
+                                st.session_state.messages.append({"role": "assistant", "content": response})
+                            st.rerun()
         
         st.markdown("---")
     

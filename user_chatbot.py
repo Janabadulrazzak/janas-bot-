@@ -483,12 +483,14 @@ def main():
             "What is Jana's professional background?"
         ]
         
-        # Display suggested questions horizontally as clickable buttons
+        # Display suggested questions in a 2-column grid
         # Use a container to ensure they're visible
         with st.container():
-            cols = st.columns(len(suggested_questions))
+            # Create 2 columns for better visibility
+            col1, col2 = st.columns(2)
             for i, question in enumerate(suggested_questions):
-                with cols[i]:
+                # Alternate between columns
+                with col1 if i % 2 == 0 else col2:
                     if st.button(question, key=f"suggest_{i}", use_container_width=True):
                         # Add the suggested question to chat
                         st.session_state.messages.append({"role": "user", "content": question})

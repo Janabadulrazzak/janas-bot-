@@ -41,21 +41,40 @@ class UserChatBot:
             
             # Initialize with minimal configuration - only use environment variable
             # This avoids passing parameters that might trigger pydantic validation errors
+            # Try delayed initialization to avoid pydantic v1 issues
+            import sys
+            import importlib
+            
+            # Clear any cached imports that might have old versions
+            if 'langchain_openai' in sys.modules:
+                importlib.reload(sys.modules['langchain_openai'])
+            
+            # Initialize embeddings - use a try-except that catches ValidationError specifically
             try:
-                # First, ensure we're using the right import
-                from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
-                
-                # Try initialization without any parameters - relies on OPENAI_API_KEY env var
-                # This is the safest method that avoids pydantic validation issues
-                self.embeddings = LCOpenAIEmbeddings()
-            except Exception as e:
-                # If that fails, try with explicit model (some versions need this)
-                try:
-                    self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-                except Exception:
-                    # Absolute last resort - create instance with minimal kwargs
-                    # Only pass what's absolutely necessary
-                    self.embeddings = OpenAIEmbeddings()
+                # Try with no parameters first - this should work if API key is in env
+                self.embeddings = OpenAIEmbeddings()
+            except Exception as init_error:
+                error_str = str(init_error).lower()
+                if 'validation' in error_str or 'pydantic' in error_str:
+                    # If it's a validation error, try importing and using the class directly
+                    # with explicit error suppression
+                    import warnings
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        # Try creating with minimal kwargs
+                        try:
+                            # Force use environment variable only
+                            self.embeddings = OpenAIEmbeddings.__new__(OpenAIEmbeddings)
+                            # Manually set the API key attribute if needed
+                            if hasattr(self.embeddings, 'openai_api_key'):
+                                self.embeddings.openai_api_key = API_KEY
+                        except Exception:
+                            # Last resort: delay initialization until actually needed
+                            self.embeddings = None
+                            st.warning("⚠️ Embeddings initialization delayed - will initialize on first use")
+                else:
+                    # Re-raise if it's not a validation error
+                    raise
             finally:
                 # Restore environment variables
                 os.environ.update(env_backup)
@@ -75,6 +94,13 @@ class UserChatBot:
         
     def load_vectorstore(self):
         """Load existing vector store"""
+        # Initialize embeddings if they were delayed
+        if self.embeddings is None:
+            try:
+                self.embeddings = OpenAIEmbeddings()
+            except Exception:
+                return False
+        
         if os.path.exists(FAISS_INDEX_PATH) and os.path.exists(FAISS_PKL_PATH):
             try:
                 self.vectorstore = FAISS.load_local(

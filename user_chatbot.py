@@ -174,23 +174,32 @@ def main():
         layout="centered"
     )
     
-    # Get API key from Streamlit secrets (cloud) or environment variable (local)
-    global API_KEY
-    
-    # Try Streamlit secrets first (for cloud deployment)
-    try:
-        if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
-            API_KEY = st.secrets["OPENAI_API_KEY"]
-            os.environ["OPENAI_API_KEY"] = API_KEY
-        elif os.getenv("OPENAI_API_KEY"):
-            # Fallback to environment variable (for local development)
-            API_KEY = os.getenv("OPENAI_API_KEY")
-        else:
-            st.error("❌ **API Key Missing!** Please set `OPENAI_API_KEY` in Streamlit Secrets (cloud) or environment variable (local).")
+        # Get API key from Streamlit secrets (cloud) or environment variable (local)
+        global API_KEY
+        
+        # Try Streamlit secrets first (for cloud deployment)
+        try:
+            if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+                API_KEY = st.secrets["OPENAI_API_KEY"]
+                os.environ["OPENAI_API_KEY"] = API_KEY
+                # Debug: Show first and last 10 chars of key (for verification)
+                if API_KEY:
+                    key_preview = f"{API_KEY[:10]}...{API_KEY[-10:]}" if len(API_KEY) > 20 else "***"
+                    st.sidebar.info(f"🔑 API Key loaded: {key_preview}")
+            elif os.getenv("OPENAI_API_KEY"):
+                # Fallback to environment variable (for local development)
+                API_KEY = os.getenv("OPENAI_API_KEY")
+            else:
+                st.error("❌ **API Key Missing!** Please set `OPENAI_API_KEY` in Streamlit Secrets (cloud) or environment variable (local).")
+                st.stop()
+        except Exception as e:
+            st.error(f"❌ **Error loading API key:** {str(e)}")
             st.stop()
-    except Exception as e:
-        st.error(f"❌ **Error loading API key:** {str(e)}")
-        st.stop()
+        
+        # Verify the key is the new one (not the old one ending in 3-UA)
+        if API_KEY and API_KEY.endswith("3-UA"):
+            st.error("❌ **WRONG API KEY DETECTED!** You're using the OLD disabled key. Please update Streamlit Secrets with the NEW key (ending in 9zGoA).")
+            st.stop()
     
     # Clean, user-friendly styling
     st.markdown("""

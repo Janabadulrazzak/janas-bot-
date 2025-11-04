@@ -41,33 +41,35 @@ class ChatBot:
                 if 'proxy' in key.lower() or 'PROXY' in key:
                     env_backup[key] = os.environ.pop(key)
             
-            # Initialize embeddings - try multiple methods to avoid ValidationError
+            # Initialize embeddings - use environment variable only to avoid ValidationError
+            # Ensure API key is set in environment
+            os.environ["OPENAI_API_KEY"] = API_KEY
+            
+            # Remove any problematic environment variables that might cause validation errors
+            # Some versions of langchain-openai have issues with certain env vars
+            
+            # Initialize with minimal configuration - only use environment variable
+            # This avoids passing parameters that might trigger pydantic validation errors
             try:
-                # Method 1: Try with explicit API key parameter
-                self.embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
-            except (Exception, ValueError, TypeError) as e1:
+                # First, ensure we're using the right import
+                from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
+                
+                # Try initialization without any parameters - relies on OPENAI_API_KEY env var
+                # This is the safest method that avoids pydantic validation issues
+                self.embeddings = LCOpenAIEmbeddings()
+            except Exception as e:
+                # If that fails, try with explicit model (some versions need this)
                 try:
-                    # Method 2: Try with model parameter only
                     self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-                except (Exception, ValueError, TypeError) as e2:
-                    try:
-                        # Method 3: Try without any parameters (uses environment variable)
-                        # Ensure API key is in environment
-                        if 'OPENAI_API_KEY' not in os.environ:
-                            os.environ["OPENAI_API_KEY"] = API_KEY
-                        self.embeddings = OpenAIEmbeddings()
-                    except Exception as e3:
-                        # Last resort: Create with minimal config
-                        import langchain_openai
-                        # Use the class directly with just the API key from env
-                        os.environ["OPENAI_API_KEY"] = API_KEY
-                        self.embeddings = langchain_openai.OpenAIEmbeddings()
+                except Exception:
+                    # Absolute last resort - create instance with minimal kwargs
+                    # Only pass what's absolutely necessary
+                    self.embeddings = OpenAIEmbeddings()
             finally:
                 # Restore environment variables
                 os.environ.update(env_backup)
-                # Ensure API key is always set
-                if 'OPENAI_API_KEY' not in os.environ:
-                    os.environ["OPENAI_API_KEY"] = API_KEY
+                # Always ensure API key is set
+                os.environ["OPENAI_API_KEY"] = API_KEY
         
         # Initialize LLM - use environment variable
         try:

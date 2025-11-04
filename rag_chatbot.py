@@ -770,8 +770,9 @@ def main():
             st.write(message["content"])
     
     # Suggested questions - only show if resume is loaded AND no conversation started yet
-    # (exclude the initial greeting message)
-    conversation_started = len(st.session_state.messages) > 1
+    # (exclude the initial greeting message - count only user/assistant exchanges)
+    user_messages = [msg for msg in st.session_state.messages if msg["role"] == "user"]
+    conversation_started = len(user_messages) > 0
     
     if st.session_state.resume_loaded and not conversation_started:
         st.markdown("### 💡 Suggested Questions:")

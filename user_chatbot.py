@@ -12,7 +12,7 @@ from langchain.prompts import PromptTemplate
 
 # API Key Configuration
 # Default key (will be overridden by Streamlit secrets in cloud deployment)
-API_KEY = "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"
+API_KEY = "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"
 PERSIST_DIRECTORY = "./faiss_db"
 FAISS_INDEX_PATH = "./faiss_db/index.faiss"
 FAISS_PKL_PATH = "./faiss_db/index.pkl"

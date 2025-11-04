@@ -789,12 +789,12 @@ def main():
         # Display suggested questions in a 2-column grid
         # Use a container to ensure they're visible
         with st.container():
-                # Create 2 columns for better visibility
-                col1, col2 = st.columns(2)
-                for i, question in enumerate(suggested_questions):
-                    # Alternate between columns
-                    with col1 if i % 2 == 0 else col2:
-                        if st.button(question, key=f"suggest_{i}", use_container_width=True):
+            # Create 2 columns for better visibility
+            col1, col2 = st.columns(2)
+            for i, question in enumerate(suggested_questions):
+                # Alternate between columns
+                with col1 if i % 2 == 0 else col2:
+                    if st.button(question, key=f"suggest_{i}", use_container_width=True):
                             # Add the suggested question to chat
                             st.session_state.messages.append({"role": "user", "content": question})
                             with st.chat_message("user"):

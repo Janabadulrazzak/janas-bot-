@@ -1,0 +1,32 @@
+═══════════════════════════════════════════════════════════════
+  🔧 ADMIN PAGE LINKS
+═══════════════════════════════════════════════════════════════
+
+📍 LOCAL ACCESS (Same Computer):
+─────────────────────────────────
+http://localhost:8501
+
+📍 NETWORK ACCESS (Same WiFi):
+───────────────────────────────
+http://192.168.0.115:8501
+(Replace 192.168.0.115 with your computer's IP if different)
+
+═══════════════════════════════════════════════════════════════
+
+💡 TO START ADMIN PAGE:
+───────────────────────
+cd /Users/jana/rag_chatbot_app
+export OPENAI_API_KEY="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"
+source venv/bin/activate
+streamlit run rag_chatbot.py --server.port 8501 --server.address 0.0.0.0
+
+═══════════════════════════════════════════════════════════════
+
+📝 NOTE:
+───────
+• Admin page: Upload/manage resume
+• User page: Public chat (port 8502)
+• Make sure API key is set as environment variable
+
+═══════════════════════════════════════════════════════════════
+

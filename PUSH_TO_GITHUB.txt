@@ -1,0 +1,54 @@
+═══════════════════════════════════════════════════════════════
+  📤 PUSH TO GITHUB - AUTHENTICATION REQUIRED
+═══════════════════════════════════════════════════════════════
+
+Your repository is ready: https://github.com/Janabadulrazzak/janas-bot-
+
+═══════════════════════════════════════════════════════════════
+
+OPTION 1: Personal Access Token (Recommended)
+──────────────────────────────────────────────
+
+1. Go to: https://github.com/settings/tokens
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Name it: "janas-bot-push"
+4. Select scope: ✅ repo (all checkboxes under repo)
+5. Click "Generate token"
+6. COPY the token (you'll only see it once!)
+
+Then run:
+   cd /Users/jana/rag_chatbot_app
+   git push -u origin main
+
+When prompted:
+   Username: Janabadulrazzak
+   Password: [paste your token here]
+
+═══════════════════════════════════════════════════════════════
+
+OPTION 2: GitHub Desktop
+──────────────────────────
+
+If you have GitHub Desktop installed:
+1. Open GitHub Desktop
+2. File → Add Local Repository
+3. Navigate to: /Users/jana/rag_chatbot_app
+4. Click "Publish repository" button
+5. It will authenticate automatically
+
+═══════════════════════════════════════════════════════════════
+
+OPTION 3: Command Line with Token
+───────────────────────────────────
+
+You can also include the token in the URL:
+   git remote set-url origin https://YOUR_TOKEN@github.com/Janabadulrazzak/janas-bot-.git
+   git push -u origin main
+
+═══════════════════════════════════════════════════════════════
+
+Your repository URL:
+https://github.com/Janabadulrazzak/janas-bot-
+
+═══════════════════════════════════════════════════════════════
+

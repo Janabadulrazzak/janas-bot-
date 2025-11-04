@@ -1,0 +1,38 @@
+═══════════════════════════════════════════════════════════════
+  📍 YOUR CHATBOT LINKS
+═══════════════════════════════════════════════════════════════
+
+✅ Both pages are now running!
+
+───────────────────────────────────────────────────────────────
+
+LOCAL ACCESS (Same Computer):
+───────────────────────────────
+📍 Admin Page:  http://localhost:8501
+📍 User Page:   http://localhost:8502
+
+───────────────────────────────────────────────────────────────
+
+NETWORK ACCESS (Same WiFi):
+────────────────────────────
+📍 Admin Page:  http://192.168.0.115:8501
+📍 User Page:   http://192.168.0.115:8502
+
+───────────────────────────────────────────────────────────────
+
+PUBLIC ACCESS (Anywhere):
+──────────────────────────
+📍 User Page:   https://hyaloid-nonhypnotically-carmen.ngrok-free.dev
+   (Public link - works from anywhere!)
+
+───────────────────────────────────────────────────────────────
+
+NOTES:
+──────
+• Admin page: Upload/manage resume
+• User page: Public chat interface
+• Public link requires ngrok to be running
+• If links don't work, check if processes are running
+
+═══════════════════════════════════════════════════════════════
+

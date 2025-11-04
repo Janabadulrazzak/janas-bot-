@@ -24,7 +24,7 @@ wheels/
 *.egg
 
 # Vector Database
-faiss_db/
+# faiss_db/  # Commented out - needed for Streamlit Cloud deployment
 chroma_db/
 
 # Environment variables

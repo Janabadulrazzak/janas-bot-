@@ -1,0 +1,63 @@
+═══════════════════════════════════════════════════════════════
+  ⚠️ API KEY SECURITY - URGENT ACTION NEEDED
+═══════════════════════════════════════════════════════════════
+
+Your API key IS currently visible on GitHub.
+
+═══════════════════════════════════════════════════════════════
+
+IMMEDIATE ACTION: Make Repository Private
+───────────────────────────────────────────
+
+1. Go to: https://github.com/Janabadulrazzak/janas-bot-/settings
+2. Scroll down to "Danger Zone"
+3. Click "Change visibility"
+4. Select "Make private"
+5. Confirm
+
+This will hide your repository from public view.
+
+═══════════════════════════════════════════════════════════════
+
+GOOD NEWS: Streamlit Cloud Will Use Secrets
+────────────────────────────────────────────
+
+✅ Your code already supports Streamlit Secrets
+✅ When you deploy to Streamlit Cloud:
+   - Add API key in Streamlit Secrets (not in code)
+   - The Secrets value will be used (not the hardcoded one)
+   - The hardcoded key is just a fallback for local dev
+
+So for Streamlit Cloud deployment, your API key will be safe!
+
+═══════════════════════════════════════════════════════════════
+
+OPTIONAL: Remove from Code Completely
+──────────────────────────────────────
+
+If you want to remove it from GitHub entirely:
+
+1. Edit user_chatbot.py and rag_chatbot.py
+2. Change:
+   API_KEY = "sk-proj-..."
+   
+   To:
+   API_KEY = os.getenv("OPENAI_API_KEY", "")
+   
+3. Commit and push
+4. Set environment variable locally:
+   export OPENAI_API_KEY="your-key-here"
+
+But for Streamlit Cloud, Secrets will work fine!
+
+═══════════════════════════════════════════════════════════════
+
+RECOMMENDATION:
+───────────────
+1. Make repository PRIVATE (do this now!)
+2. Deploy to Streamlit Cloud
+3. Add API key in Streamlit Secrets
+4. The hardcoded key in code won't be used in production
+
+═══════════════════════════════════════════════════════════════
+

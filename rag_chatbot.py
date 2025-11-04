@@ -41,19 +41,33 @@ class ChatBot:
                 if 'proxy' in key.lower() or 'PROXY' in key:
                     env_backup[key] = os.environ.pop(key)
             
+            # Initialize embeddings - try multiple methods to avoid ValidationError
             try:
-                # Try with explicit API key parameter
+                # Method 1: Try with explicit API key parameter
                 self.embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
-            except Exception as e:
-                # Fallback: try without parameters (uses environment variable)
+            except (Exception, ValueError, TypeError) as e1:
                 try:
-                    self.embeddings = OpenAIEmbeddings()
-                except Exception:
-                    # Last resort: use environment variable only
-                    self.embeddings = OpenAIEmbeddings()
+                    # Method 2: Try with model parameter only
+                    self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+                except (Exception, ValueError, TypeError) as e2:
+                    try:
+                        # Method 3: Try without any parameters (uses environment variable)
+                        # Ensure API key is in environment
+                        if 'OPENAI_API_KEY' not in os.environ:
+                            os.environ["OPENAI_API_KEY"] = API_KEY
+                        self.embeddings = OpenAIEmbeddings()
+                    except Exception as e3:
+                        # Last resort: Create with minimal config
+                        import langchain_openai
+                        # Use the class directly with just the API key from env
+                        os.environ["OPENAI_API_KEY"] = API_KEY
+                        self.embeddings = langchain_openai.OpenAIEmbeddings()
             finally:
                 # Restore environment variables
                 os.environ.update(env_backup)
+                # Ensure API key is always set
+                if 'OPENAI_API_KEY' not in os.environ:
+                    os.environ["OPENAI_API_KEY"] = API_KEY
         
         # Initialize LLM - use environment variable
         try:

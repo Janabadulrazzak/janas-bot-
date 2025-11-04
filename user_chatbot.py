@@ -11,6 +11,7 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 # API Key Configuration
+# Default key (will be overridden by Streamlit secrets in cloud deployment)
 API_KEY = "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"
 PERSIST_DIRECTORY = "./faiss_db"
 FAISS_INDEX_PATH = "./faiss_db/index.faiss"
@@ -25,11 +26,35 @@ class UserChatBot:
         import warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.embeddings = OpenAIEmbeddings()
-            self.llm = ChatOpenAI(
-                model="gpt-3.5-turbo",
-                temperature=0.7
-            )
+            # Initialize embeddings - handle version compatibility issues
+            # Remove any proxy-related environment variables that might cause issues
+            env_backup = {}
+            for key in list(os.environ.keys()):
+                if 'proxy' in key.lower() or 'PROXY' in key:
+                    env_backup[key] = os.environ.pop(key)
+            
+            try:
+                # Try with explicit API key parameter
+                self.embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
+            except Exception as e:
+                # Fallback: try without parameters (uses environment variable)
+                try:
+                    self.embeddings = OpenAIEmbeddings()
+                except Exception:
+                    # Last resort: use environment variable only
+                    self.embeddings = OpenAIEmbeddings()
+            finally:
+                # Restore environment variables
+                os.environ.update(env_backup)
+            
+            try:
+                self.llm = ChatOpenAI(
+                    model="gpt-3.5-turbo",
+                    temperature=0.7
+                )
+            except Exception:
+                self.llm = ChatOpenAI(temperature=0.7)
+        
         self.vectorstore = None
         self.qa_chain = None
         
@@ -109,6 +134,15 @@ def main():
         page_icon="💬",
         layout="centered"
     )
+    
+    # Try to get API key from Streamlit secrets (for cloud deployment)
+    global API_KEY
+    try:
+        if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+            API_KEY = st.secrets["OPENAI_API_KEY"]
+            os.environ["OPENAI_API_KEY"] = API_KEY
+    except:
+        pass  # Use default API_KEY if secrets not available
     
     # Clean, user-friendly styling
     st.markdown("""

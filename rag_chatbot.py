@@ -34,7 +34,26 @@ class ChatBot:
         import warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.embeddings = OpenAIEmbeddings()
+            # Initialize embeddings - handle version compatibility issues
+            # Remove any proxy-related environment variables that might cause issues
+            env_backup = {}
+            for key in list(os.environ.keys()):
+                if 'proxy' in key.lower() or 'PROXY' in key:
+                    env_backup[key] = os.environ.pop(key)
+            
+            try:
+                # Try with explicit API key parameter
+                self.embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
+            except Exception as e:
+                # Fallback: try without parameters (uses environment variable)
+                try:
+                    self.embeddings = OpenAIEmbeddings()
+                except Exception:
+                    # Last resort: use environment variable only
+                    self.embeddings = OpenAIEmbeddings()
+            finally:
+                # Restore environment variables
+                os.environ.update(env_backup)
         
         # Initialize LLM - use environment variable
         try:

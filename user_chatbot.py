@@ -26,16 +26,16 @@ class UserChatBot:
         os.environ["OPENAI_API_KEY"] = API_KEY
         
         # Initialize embeddings - use modern API with compatible versions
+        # Rely on OPENAI_API_KEY environment variable
         self.embeddings = OpenAIEmbeddings(
-            model="text-embedding-3-small",
-            api_key=API_KEY
+            model="text-embedding-3-small"
         )
         
         # Initialize LLM
+        # Rely on OPENAI_API_KEY environment variable
         self.llm = ChatOpenAI(
             model="gpt-3.5-turbo",
-            temperature=0.7,
-            api_key=API_KEY
+            temperature=0.7
         )
         
         self.vectorstore = None

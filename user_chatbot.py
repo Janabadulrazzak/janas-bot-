@@ -461,16 +461,19 @@ def main():
     user_messages = [msg for msg in st.session_state.messages if msg["role"] == "user"]
     has_user_messages = len(user_messages) > 0
     
-    # Debug: Show status (remove this later)
+    # Debug: Show status
     st.sidebar.write(f"🔍 Debug: User messages: {len(user_messages)}")
     st.sidebar.write(f"🔍 Debug: Show questions: {not has_user_messages}")
     st.sidebar.write(f"🔍 Debug: Total messages: {len(st.session_state.messages)}")
     
-    # ALWAYS show suggested questions for testing (we'll make it conditional later)
     # Show suggested questions if no user has asked anything yet
     if not has_user_messages:
-        st.sidebar.write("✅ Showing suggested questions!")
+        st.sidebar.write("✅ Condition met - questions should show!")
+        
+        # Suggested questions section
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("### 💡 Suggested Questions:")
+        st.markdown("<br>", unsafe_allow_html=True)
         suggested_questions = [
             "What companies has Jana worked at?",
             "What is Jana's educational background?",
@@ -509,6 +512,9 @@ def main():
                         st.rerun()
         
         st.markdown("---")
+        st.markdown("<br>", unsafe_allow_html=True)
+    else:
+        st.sidebar.write("❌ Questions hidden - user has messages")
     
     # Chat input
     if prompt := st.chat_input("Ask me about Jana..."):

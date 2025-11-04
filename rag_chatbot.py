@@ -769,8 +769,11 @@ def main():
         with st.chat_message(message["role"]):
             st.write(message["content"])
     
-    # Suggested questions (only show if resume is loaded)
-    if st.session_state.resume_loaded:
+    # Suggested questions - only show if resume is loaded AND no conversation started yet
+    # (exclude the initial greeting message)
+    conversation_started = len(st.session_state.messages) > 1
+    
+    if st.session_state.resume_loaded and not conversation_started:
         st.markdown("### 💡 Suggested Questions:")
         suggested_questions = [
             "What companies has Jana worked at?",
@@ -781,10 +784,10 @@ def main():
             "What is Jana's professional background?"
         ]
         
-        # Display suggested questions as clickable buttons
-        cols = st.columns(2)
+        # Display suggested questions horizontally as clickable buttons
+        cols = st.columns(len(suggested_questions))
         for i, question in enumerate(suggested_questions):
-            with cols[i % 2]:
+            with cols[i]:
                 if st.button(question, key=f"suggest_{i}", use_container_width=True):
                     # Add the suggested question to chat
                     st.session_state.messages.append({"role": "user", "content": question})

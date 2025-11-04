@@ -230,7 +230,7 @@ class ChatBot:
         )
         
         # Custom prompt to encourage natural language generation
-            prompt_template = """You are Jana's friendly chatbot assistant. Be warm, conversational, and helpful.
+        prompt_template = """You are Jana's friendly chatbot assistant. Be warm, conversational, and helpful.
 
 If the question is a greeting (like "hi", "hello", "hey"), respond warmly and introduce yourself. For example:
 - "Hi! I'm Jana's Bot. I'm here to help answer questions about Jana's background, experience, skills, and qualifications. What would you like to know?"
@@ -742,12 +742,12 @@ def main():
         if not st.session_state.resume_loaded:
             st.session_state.messages.append({
                 "role": "assistant",
-                "content": "Hello! I'm Jana's Bot. Please upload a resume PDF above to get started. Once loaded, you can ask me questions about Jana's background, experience, skills, education, and qualifications."
+                "content": "Hi there! 👋 I'm Jana's Bot! Please upload a resume PDF above to get started. Once loaded, I'll be happy to answer questions about Jana's background, experience, skills, education, and qualifications. Feel free to ask me anything!"
             })
         else:
             st.session_state.messages.append({
                 "role": "assistant",
-                "content": "Hello! I'm Jana's Bot. I'm ready to answer questions about Jana. What would you like to know?"
+                "content": "Hi there! 👋 I'm Jana's Bot, and I'm ready to help! I can answer questions about Jana based on her resume. What would you like to know? Feel free to ask me anything - I'm here to chat!"
             })
     
     # Display chat messages

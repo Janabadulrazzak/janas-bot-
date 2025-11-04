@@ -122,7 +122,7 @@ class UserChatBot:
         )
         
         # Custom prompt for natural responses
-            prompt_template = """You are Jana's friendly chatbot assistant. Be warm, conversational, and helpful.
+        prompt_template = """You are Jana's friendly chatbot assistant. Be warm, conversational, and helpful.
 
 If the question is a greeting (like "hi", "hello", "hey"), respond warmly and introduce yourself. For example:
 - "Hi! I'm Jana's Bot. I'm here to help answer questions about Jana's background, experience, skills, and qualifications. What would you like to know?"

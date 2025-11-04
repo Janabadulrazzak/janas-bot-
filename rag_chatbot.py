@@ -770,11 +770,12 @@ def main():
             st.write(message["content"])
     
     # Suggested questions - only show if resume is loaded AND no conversation started yet
-    # (exclude the initial greeting message - count only user/assistant exchanges)
+    # Count only user messages (not the initial greeting)
     user_messages = [msg for msg in st.session_state.messages if msg["role"] == "user"]
-    conversation_started = len(user_messages) > 0
+    has_user_messages = len(user_messages) > 0
     
-    if st.session_state.resume_loaded and not conversation_started:
+    # Show suggested questions if resume is loaded and no user has asked anything yet
+    if st.session_state.resume_loaded and not has_user_messages:
         st.markdown("### 💡 Suggested Questions:")
         suggested_questions = [
             "What companies has Jana worked at?",
@@ -786,33 +787,35 @@ def main():
         ]
         
         # Display suggested questions horizontally as clickable buttons
-        cols = st.columns(len(suggested_questions))
-        for i, question in enumerate(suggested_questions):
-            with cols[i]:
-                if st.button(question, key=f"suggest_{i}", use_container_width=True):
-                    # Add the suggested question to chat
-                    st.session_state.messages.append({"role": "user", "content": question})
-                    with st.chat_message("user"):
-                        st.write(question)
-                    with st.chat_message("assistant"):
-                        if not st.session_state.resume_loaded:
-                            response = "Please upload a resume PDF first using the upload section above, then click 'Load Resume'."
-                        else:
-                            if st.session_state.bot is None:
-                                response = "Bot not initialized. Please reload the page."
-                            elif st.session_state.bot.qa_chain is None:
-                                response = "QA chain not set up. Please reload your resume."
+        # Use a container to ensure they're visible
+        with st.container():
+            cols = st.columns(len(suggested_questions))
+            for i, question in enumerate(suggested_questions):
+                with cols[i]:
+                    if st.button(question, key=f"suggest_{i}", use_container_width=True):
+                        # Add the suggested question to chat
+                        st.session_state.messages.append({"role": "user", "content": question})
+                        with st.chat_message("user"):
+                            st.write(question)
+                        with st.chat_message("assistant"):
+                            if not st.session_state.resume_loaded:
+                                response = "Please upload a resume PDF first using the upload section above, then click 'Load Resume'."
                             else:
-                                with st.spinner("Thinking..."):
-                                    try:
-                                        response = st.session_state.bot.get_response(question)
-                                        if response is None or response == "":
-                                            response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
-                                    except Exception as e:
-                                        response = f"Error: {str(e)}. Please try again or reload the resume."
-                        st.write(response)
-                        st.session_state.messages.append({"role": "assistant", "content": response})
-                    st.rerun()
+                                if st.session_state.bot is None:
+                                    response = "Bot not initialized. Please reload the page."
+                                elif st.session_state.bot.qa_chain is None:
+                                    response = "QA chain not set up. Please reload your resume."
+                                else:
+                                    with st.spinner("Thinking..."):
+                                        try:
+                                            response = st.session_state.bot.get_response(question)
+                                            if response is None or response == "":
+                                                response = "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
+                                        except Exception as e:
+                                            response = f"Error: {str(e)}. Please try again or reload the resume."
+                            st.write(response)
+                            st.session_state.messages.append({"role": "assistant", "content": response})
+                        st.rerun()
         
         st.markdown("---")
     

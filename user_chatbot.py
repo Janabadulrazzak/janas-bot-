@@ -461,6 +461,11 @@ def main():
     user_messages = [msg for msg in st.session_state.messages if msg["role"] == "user"]
     has_user_messages = len(user_messages) > 0
     
+    # Debug: Show status (remove this later)
+    st.sidebar.write(f"🔍 Debug: User messages: {len(user_messages)}")
+    st.sidebar.write(f"🔍 Debug: Show questions: {not has_user_messages}")
+    st.sidebar.write(f"🔍 Debug: Total messages: {len(st.session_state.messages)}")
+    
     # Show suggested questions if no user has asked anything yet
     if not has_user_messages:
         st.markdown("### 💡 Suggested Questions:")

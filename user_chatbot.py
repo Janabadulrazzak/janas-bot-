@@ -49,35 +49,20 @@ class UserChatBot:
             if 'langchain_openai' in sys.modules:
                 importlib.reload(sys.modules['langchain_openai'])
             
-            # Initialize embeddings - handle ValidationError from pydantic v1
-            # The issue is langchain-openai uses pydantic v1 internally
-            try:
-                # Try to import and catch ValidationError specifically
-                from pydantic.v1.error_wrappers import ValidationError as PydanticV1ValidationError
-            except ImportError:
-                PydanticV1ValidationError = Exception
+            # Initialize embeddings - always use model parameter to avoid ValidationError
+            # The model parameter helps bypass pydantic v1 validation issues
+            # Ensure API key is in environment
+            os.environ["OPENAI_API_KEY"] = API_KEY
             
+            # Always use model parameter - this is more reliable with pydantic v1
             try:
-                # Try with no parameters first - this should work if API key is in env
-                self.embeddings = OpenAIEmbeddings()
-            except PydanticV1ValidationError as ve:
-                # If it's a pydantic v1 validation error, try to bypass it
-                # by setting the API key in environment and using a different approach
-                try:
-                    # Try using the class with explicit model name
-                    from langchain_openai.embeddings import OpenAIEmbeddings as LCEmbeddings
-                    self.embeddings = LCEmbeddings(model="text-embedding-ada-002")
-                except Exception:
-                    # If that fails, we'll need to delay initialization
-                    # Store the API key for later initialization
-                    self._api_key = API_KEY
-                    self.embeddings = None
-                    # Don't show warning in __init__ - handle it when needed
+                self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
             except Exception as e:
-                # For any other error, try one more time with model parameter
+                # If model parameter fails, try without it
                 try:
-                    self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+                    self.embeddings = OpenAIEmbeddings()
                 except Exception:
+                    # Store for delayed initialization
                     self._api_key = API_KEY
                     self.embeddings = None
             finally:

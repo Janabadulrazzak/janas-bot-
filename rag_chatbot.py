@@ -58,31 +58,36 @@ class ChatBot:
             if 'langchain_openai' in sys.modules:
                 importlib.reload(sys.modules['langchain_openai'])
             
-            # Initialize embeddings - use a try-except that catches ValidationError specifically
+            # Initialize embeddings - handle ValidationError from pydantic v1
+            # The issue is langchain-openai uses pydantic v1 internally
+            try:
+                # Try to import and catch ValidationError specifically
+                from pydantic.v1.error_wrappers import ValidationError as PydanticV1ValidationError
+            except ImportError:
+                PydanticV1ValidationError = Exception
+            
             try:
                 # Try with no parameters first - this should work if API key is in env
                 self.embeddings = OpenAIEmbeddings()
-            except Exception as init_error:
-                error_str = str(init_error).lower()
-                if 'validation' in error_str or 'pydantic' in error_str:
-                    # If it's a validation error, try importing and using the class directly
-                    # with explicit error suppression
-                    import warnings
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore")
-                        # Try creating with minimal kwargs
-                        try:
-                            # Force use environment variable only
-                            self.embeddings = OpenAIEmbeddings.__new__(OpenAIEmbeddings)
-                            # Manually set the API key attribute if needed
-                            if hasattr(self.embeddings, 'openai_api_key'):
-                                self.embeddings.openai_api_key = API_KEY
-                        except Exception:
-                            # Last resort: delay initialization until actually needed
-                            self.embeddings = None
-                else:
-                    # Re-raise if it's not a validation error
-                    raise
+            except PydanticV1ValidationError as ve:
+                # If it's a pydantic v1 validation error, try to bypass it
+                # by setting the API key in environment and using a different approach
+                try:
+                    # Try using the class with explicit model name
+                    from langchain_openai.embeddings import OpenAIEmbeddings as LCEmbeddings
+                    self.embeddings = LCEmbeddings(model="text-embedding-ada-002")
+                except Exception:
+                    # If that fails, we'll need to delay initialization
+                    # Store the API key for later initialization
+                    self._api_key = API_KEY
+                    self.embeddings = None
+            except Exception as e:
+                # For any other error, try one more time with model parameter
+                try:
+                    self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+                except Exception:
+                    self._api_key = API_KEY
+                    self.embeddings = None
             finally:
                 # Restore environment variables
                 os.environ.update(env_backup)

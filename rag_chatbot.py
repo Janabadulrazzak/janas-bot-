@@ -28,67 +28,22 @@ class ChatBot:
         # Set API key in environment first (required)
         if API_KEY is None:
             raise ValueError("API_KEY not set. Please set it in main() first.")
+        
+        # Set API key in environment
         os.environ["OPENAI_API_KEY"] = API_KEY
         
-        # Initialize embeddings - uses OPENAI_API_KEY from environment
-        import warnings
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            # Initialize embeddings - handle version compatibility issues
-            # Remove any proxy-related environment variables that might cause issues
-            env_backup = {}
-            for key in list(os.environ.keys()):
-                if 'proxy' in key.lower() or 'PROXY' in key:
-                    env_backup[key] = os.environ.pop(key)
-            
-            # Initialize embeddings - use environment variable only to avoid ValidationError
-            # Ensure API key is set in environment
-            os.environ["OPENAI_API_KEY"] = API_KEY
-            
-            # Remove any problematic environment variables that might cause validation errors
-            # Some versions of langchain-openai have issues with certain env vars
-            
-            # Initialize with minimal configuration - only use environment variable
-            # This avoids passing parameters that might trigger pydantic validation errors
-            # Try delayed initialization to avoid pydantic v1 issues
-            import sys
-            import importlib
-            
-            # Clear any cached imports that might have old versions
-            if 'langchain_openai' in sys.modules:
-                importlib.reload(sys.modules['langchain_openai'])
-            
-            # Initialize embeddings - always use model parameter to avoid ValidationError
-            # The model parameter helps bypass pydantic v1 validation issues
-            # Ensure API key is in environment
-            os.environ["OPENAI_API_KEY"] = API_KEY
-            
-            # Always use model parameter - this is more reliable with pydantic v1
-            try:
-                self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-            except Exception as e:
-                # If model parameter fails, try without it
-                try:
-                    self.embeddings = OpenAIEmbeddings()
-                except Exception:
-                    # Store for delayed initialization
-                    self._api_key = API_KEY
-                    self.embeddings = None
-            finally:
-                # Restore environment variables
-                os.environ.update(env_backup)
-                # Always ensure API key is set
-                os.environ["OPENAI_API_KEY"] = API_KEY
+        # Initialize embeddings - use modern API with compatible versions
+        self.embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-small",
+            api_key=API_KEY
+        )
         
-        # Initialize LLM - use environment variable
-        try:
-            self.llm = ChatOpenAI(
-                model="gpt-3.5-turbo",
-                temperature=0.7
-            )
-        except Exception:
-            # Fallback
-            self.llm = ChatOpenAI(temperature=0.7)
+        # Initialize LLM
+        self.llm = ChatOpenAI(
+            model="gpt-3.5-turbo",
+            temperature=0.7,
+            api_key=API_KEY
+        )
         
         self.vectorstore = None
         self.qa_chain = None
